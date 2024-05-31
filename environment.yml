@@ -4,3 +4,10 @@ channels:
 dependencies:
   - python>=3.8
   - conda
+  # dev deps
+  - black
+  - ruff
+  - pytest
+  - python-build
+  - setuptools
+  - setuptools_scm>=8
