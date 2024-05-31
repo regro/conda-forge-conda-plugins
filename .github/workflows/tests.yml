@@ -31,7 +31,6 @@ jobs:
 
       - name: configure conda and install code
         run: |
-          micromamba install --file requirements.dev.txt
           pip install --no-deps --no-build-isolation -e .
 
       - name: test versions
