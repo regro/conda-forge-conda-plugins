@@ -23,7 +23,7 @@ def conda_virtual_packages():
         except Exception:
             pass
 
-    if openmpi_version is not None:
+    if openmpi_version:
         yield CondaVirtualPackage(
             name="openmpi",
             version=openmpi_version,
