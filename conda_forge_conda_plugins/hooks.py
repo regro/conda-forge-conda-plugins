@@ -10,13 +10,21 @@ from conda.plugins import CondaVirtualPackage, hookimpl
 logger = logging.getLogger(__name__)
 
 
+def _real_abs_path(path):
+    if path is None:
+        return None
+    return os.path.realpath(os.path.abspath(path))
+
+
 def _find_command_not_in_a_conda_prefix(cmd):
-    pth = shutil.which(cmd)
+    pth = _real_abs_path(shutil.which(cmd))
 
     if (
         pth is None
-        or pth.startswith(context.root_prefix)
-        or pth.startswith(tuple(list_all_known_prefixes()))
+        or pth.startswith(_real_abs_path(context.root_prefix))
+        or pth.startswith(
+            tuple(_real_abs_path(_pth) for _pth in list_all_known_prefixes())
+        )
     ):
         return None
 
