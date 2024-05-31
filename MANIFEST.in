@@ -1,0 +1,3 @@
+include conda_forge_conda_plugins/_version.py
+include environment.yml
+include License
