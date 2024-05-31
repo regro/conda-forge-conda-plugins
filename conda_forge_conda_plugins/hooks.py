@@ -1,10 +1,13 @@
+import logging
 import os
 import shutil
 import subprocess
 
-from conda.base import context
+from conda.base.context import context
 from conda.core.envs_manager import list_all_known_prefixes
 from conda.plugins import CondaVirtualPackage, hookimpl
+
+logger = logging.getLogger(__name__)
 
 
 def _find_command_not_in_a_conda_prefix(cmd):
@@ -38,7 +41,8 @@ def conda_virtual_packages():
                         if line.startswith("ompi:version:full:"):
                             openmpi_version = line.strip().split(":")[3].strip()
                             break
-        except Exception:
+        except Exception as e:
+            logger.error(f"Error while trying to find openmpi version: {e}", exc_info=e)
             pass
 
     if openmpi_version:
@@ -64,7 +68,8 @@ def conda_virtual_packages():
                         if line.startswith("MPICH Version:"):
                             mpich_version = line.strip().split(":")[1].strip()
                             break
-        except Exception:
+        except Exception as e:
+            logger.error(f"Error while trying to find openmpi version: {e}", exc_info=e)
             pass
 
     if mpich_version:
