@@ -1,4 +1,4 @@
-from conda.plugins import hookimpl, CondaSubcommand
+from conda.plugins import CondaSubcommand, hookimpl
 
 
 @hookimpl
@@ -7,7 +7,5 @@ def conda_subcommands():
         print("Hello conda!")
 
     yield CondaSubcommand(
-        name="hello",
-        action=hello_conda,
-        summary="Command that prints \"Hello conda!\""
+        name="hello", action=hello_conda, summary='Command that prints "Hello conda!"'
     )
