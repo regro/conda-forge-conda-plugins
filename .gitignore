@@ -25,3 +25,5 @@ coverage.xml
 .ipynb_checkpoints/
 .pytest_cache/*
 .pytest_cache
+
+conda_forge_conda_plugins/_version.py

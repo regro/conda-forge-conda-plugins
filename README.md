@@ -7,4 +7,8 @@ conda plugins for the `conda-forge` ecosystem
 
 ### OpenMPI Virtual Package
 
-This plugin provides the `__openmpi` virtual package to be used in conjunction with the `external*` builds of the `conda-forge` `openmpi` package.
+This plugin provides the `__openmpi` virtual package to be used in conjunction with the `external*` builds of the `conda-forge` `openmpi` package. If the `ompi_info` command is found in the path, the `__openmpi` virtual package is set to the installed version of OpenMPI. You can override the version by setting the `CONDA_OVERRIDE_OPENMPI` environment variable.
+
+### MPICH Virtual Package
+
+This plugin provides the `__mpich` virtual package to be used in conjunction with the `external*` builds of the `conda-forge` `mpich` package. If the `mpichversion` command is found in the path, the `__mpich` virtual package is set to the installed version of MPICH. You can override the version by setting the `CONDA_OVERRIDE_MPICH` environment variable.
