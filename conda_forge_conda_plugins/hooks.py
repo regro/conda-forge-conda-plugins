@@ -1,13 +1,31 @@
-from conda.plugins import hookimpl, CondaSubcommand
+import os
+import subprocess
+
+from conda.plugins import CondaVirtualPackage, hookimpl
 
 
 @hookimpl
-def conda_subcommands():
-    def hello_conda(args):
-        print("Hello conda!")
+def conda_virtual_packages():
+    # openmpi virtual package
+    openmpi_version = None
+    if "CONDA_OVERRIDE_OPENMPI" in os.environ:
+        openmpi_version = os.environ["CONDA_OVERRIDE_OPENMPI"]
+    else:
+        try:
+            ret = subprocess.run(
+                ["ompi_info", "--parsable"], capture_output=True, text=True
+            )
+            if ret.returncode == 0:
+                for line in ret.stdout.splitlines():
+                    if line.startswith("ompi:version:full:"):
+                        openmpi_version = line.strip().split(":")[3]
+                        break
+        except Exception:
+            pass
 
-    yield CondaSubcommand(
-        name="hello",
-        action=hello_conda,
-        summary="Command that prints \"Hello conda!\""
-    )
+    if openmpi_version is not None:
+        yield CondaVirtualPackage(
+            name="openmpi",
+            version=openmpi_version,
+            build=None,
+        )
