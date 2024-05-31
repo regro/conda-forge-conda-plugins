@@ -2,3 +2,4 @@ pytest
 black
 ruff
 python-build
+setuptools_scm>=8
