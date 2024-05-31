@@ -47,7 +47,7 @@ def conda_virtual_packages():
         except Exception:
             pass
 
-    if openmpi_version:
+    if mpich_version:
         yield CondaVirtualPackage(
             name="mpich",
             version=mpich_version,
