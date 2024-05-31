@@ -1,7 +1,23 @@
 import os
+import shutil
 import subprocess
 
+from conda.base import context
+from conda.core.envs_manager import list_all_known_prefixes
 from conda.plugins import CondaVirtualPackage, hookimpl
+
+
+def _find_command_not_in_a_conda_prefix(cmd):
+    pth = shutil.which(cmd)
+
+    if (
+        pth is None
+        or pth.startswith(context.root_prefix)
+        or pth.startswith(tuple(list_all_known_prefixes()))
+    ):
+        return None
+
+    return pth
 
 
 @hookimpl
@@ -12,14 +28,16 @@ def conda_virtual_packages():
         openmpi_version = os.environ["CONDA_OVERRIDE_OPENMPI"]
     else:
         try:
-            ret = subprocess.run(
-                ["ompi_info", "--parsable"], capture_output=True, text=True
-            )
-            if ret.returncode == 0:
-                for line in ret.stdout.splitlines():
-                    if line.startswith("ompi:version:full:"):
-                        openmpi_version = line.strip().split(":")[3].strip()
-                        break
+            ompi_info_pth = _find_command_not_in_a_conda_prefix("ompi_info")
+            if ompi_info_pth is not None:
+                ret = subprocess.run(
+                    [ompi_info_pth, "--parsable"], capture_output=True, text=True
+                )
+                if ret.returncode == 0:
+                    for line in ret.stdout.splitlines():
+                        if line.startswith("ompi:version:full:"):
+                            openmpi_version = line.strip().split(":")[3].strip()
+                            break
         except Exception:
             pass
 
@@ -36,14 +54,16 @@ def conda_virtual_packages():
         mpich_version = os.environ["CONDA_OVERRIDE_MPICH"]
     else:
         try:
-            ret = subprocess.run(
-                ["mpichversion", "--version"], capture_output=True, text=True
-            )
-            if ret.returncode == 0:
-                for line in ret.stdout.splitlines():
-                    if line.startswith("MPICH Version:"):
-                        mpich_version = line.strip().split(":")[1].strip()
-                        break
+            mpichversion_pth = _find_command_not_in_a_conda_prefix("mpichversion")
+            if mpichversion_pth is not None:
+                ret = subprocess.run(
+                    [mpichversion_pth, "--version"], capture_output=True, text=True
+                )
+                if ret.returncode == 0:
+                    for line in ret.stdout.splitlines():
+                        if line.startswith("MPICH Version:"):
+                            mpich_version = line.strip().split(":")[1].strip()
+                            break
         except Exception:
             pass
 
