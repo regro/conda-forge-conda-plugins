@@ -16,19 +16,31 @@ def _real_abs_path(path):
     return os.path.realpath(os.path.abspath(path))
 
 
-def _find_command_not_in_a_conda_prefix(cmd):
-    pth = _real_abs_path(shutil.which(cmd))
+def _path_without_conda_prefixes():
+    """return $PATH, excluding conda prefixes
 
-    if (
-        pth is None
-        or pth.startswith(_real_abs_path(context.root_prefix))
-        or pth.startswith(
-            tuple(_real_abs_path(_pth) for _pth in list_all_known_prefixes())
-        )
-    ):
+    If $PATH not specified, return None to fallback on shutil.which default behavior
+    """
+    env_path = os.getenv("PATH")
+    if env_path is None:
+        # None allows shutil.which to resolve system default path,
+        # which won't include conda
         return None
+    # add trailing `/` to make sure `/opt/condasomething/foo` doesn't match `/opt/conda`
+    # could use Pathlib for this
+    all_prefixes = tuple(
+        _real_abs_path(prefix) + os.path.sep
+        for prefix in [context.root_prefix, *list_all_known_prefixes()]
+    )
+    return os.pathsep.join(
+        path
+        for path in env_path.split(os.pathsep)
+        if not (_real_abs_path(path) + os.path.sep).startswith(all_prefixes)
+    )
 
-    return pth
+
+def _find_command_not_in_a_conda_prefix(cmd):
+    return shutil.which(cmd, path=_path_without_conda_prefixes())
 
 
 @hookimpl
